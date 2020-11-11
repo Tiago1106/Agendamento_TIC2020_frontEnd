@@ -1,0 +1,125 @@
+import React, { useRef, useState } from 'react';
+import { View } from 'react-native';
+import { Form, FormHandles } from '@unform/core';
+import { Picker } from '@react-native-picker/picker';
+import { useNavigation } from '@react-navigation/native';
+
+import { date } from 'yup';
+import { TextInput } from 'react-native-gesture-handler';
+import Header from '../../../components/Header';
+import Input from '../../../components/Input';
+import Button from '../../../components/Button';
+import { numberMonth, dateMask, hourMask } from '../../../utils/trasnforms';
+
+import { Container, AreaSelect, AreaForm } from './styles';
+
+const services = [
+  {
+    id: '1',
+    nameService: 'teste 1',
+    timerService: '40',
+  },
+  {
+    id: '2',
+    nameService: 'teste 2',
+    timerService: '60',
+  },
+  {
+    id: '3',
+    nameService: 'teste 3',
+    timerService: '90',
+  },
+];
+
+const NewScheduling: React.FC = () => {
+  const formRef = useRef<FormHandles>(null);
+  const navigation = useNavigation();
+
+  const [selectService, setSelectService] = useState('');
+  const [newDate, setNewDate] = useState('');
+  const [newTime, setNewTime] = useState('');
+
+  function selectDate(data: Date): void {
+    const newData = data.toString();
+    const month = newData.substring(4, 7);
+    const newDay = newData.substring(8, 10);
+    const newYear = newData.substring(11, 15);
+    const newMonth = numberMonth(month);
+    setNewDate(`${newDay}/${newMonth}/${newYear}`);
+  }
+
+  function selectHour(hour: Date): void {
+    const newHour = hour.toString().substring(16, 21);
+    setNewTime(newHour);
+  }
+
+  async function createSchenduling(): Promise<void> {
+    const newData = {
+      nameProvider: 'Salão dos brother',
+      nameSelect: selectService,
+      date: newDate,
+      time: newTime,
+    };
+    console.log(newData);
+
+    navigation.navigate('Home');
+  }
+
+  return (
+    <View style={{ backgroundColor: '#fff', flex: 1 }}>
+      <Header title="Novo agendamento" />
+      <Container>
+        <AreaForm>
+          <Form ref={formRef} onSubmit={() => console.log('asd')}>
+            <Input
+              name="nameprovider"
+              defaultValue="Salão dos brother"
+              editable={false}
+              icon="home"
+            />
+            <AreaSelect>
+              <Picker
+                selectedValue={selectService}
+                style={{ height: 50, width: '100%' }}
+                onValueChange={(itemValue, itemIndex) =>
+                  setSelectService(itemValue.toString())
+                } // eslint-disable-line
+              >
+                <Picker.Item label="Selecione o serviço" value="notService" />
+                {services.map((item) => (
+                  <Picker.Item
+                    color="#333"
+                    key={item.id}
+                    label={item.nameService}
+                    value={item.nameService}
+                  />
+                ))}
+              </Picker>
+            </AreaSelect>
+            <Input
+              name="date"
+              icon="calendar"
+              onChangeText={(text) => setNewDate(text)}
+              value={dateMask(newDate)}
+              maxLength={10}
+              placeholder="dd/mm/aaaa"
+            />
+            <Input
+              name="hour"
+              icon="clock"
+              onChangeText={(text) => setNewTime(text)}
+              value={hourMask(newTime)}
+              maxLength={5}
+              placeholder="hh:mm"
+            />
+          </Form>
+        </AreaForm>
+        <Button green icon="plus" onPress={() => createSchenduling()}>
+          Cadastrar novo agendamento
+        </Button>
+      </Container>
+    </View>
+  );
+};
+
+export default NewScheduling;
