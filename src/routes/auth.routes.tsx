@@ -11,6 +11,7 @@ import Search from '../pages/App/Search';
 import Profile from '../pages/App/Profile';
 import NewScheduling from '../pages/App/NewScheduling';
 import Provider from '../pages/App/Provider';
+import Notification from '../pages/App/Notification';
 
 const Auth = createStackNavigator();
 
@@ -31,6 +32,7 @@ const AuthRoutes: React.FC = () => (
     <Auth.Screen name="Profile" component={Profile} />
     <Auth.Screen name="NewScheduling" component={NewScheduling} />
     <Auth.Screen name="Provider" component={Provider} />
+    <Auth.Screen name="Notification" component={Notification} />
   </Auth.Navigator>
 );
 

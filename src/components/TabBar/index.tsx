@@ -16,12 +16,9 @@ const TabBar: React.FC<TabBarColorProps> = ({ namePage }) => {
         <Home isFocus={namePage === 'home'} name="home" size={20} />
       </AreaIcon>
       <AreaIcon onPress={() => navigation.navigate('Search')}>
-        <Search isFocus={namePage === 'search'} name="search" size={20} />
-      </AreaIcon>
-      <AreaIcon onPress={() => navigation.navigate('NewScheduling')}>
         <Plus isFocus={namePage === 'plus'} name="circle-with-plus" size={20} />
       </AreaIcon>
-      <AreaIcon onPress={() => navigation.navigate('Provider')}>
+      <AreaIcon onPress={() => navigation.navigate('Notification')}>
         <Bell isFocus={namePage === 'bell'} name="bell" size={20} />
       </AreaIcon>
       <AreaIcon onPress={() => navigation.navigate('Profile')}>

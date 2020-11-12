@@ -1,11 +1,9 @@
 import React, { useRef, useState } from 'react';
-import { View } from 'react-native';
+import { View, Alert } from 'react-native';
 import { Form, FormHandles } from '@unform/core';
 import { Picker } from '@react-native-picker/picker';
 import { useNavigation } from '@react-navigation/native';
 
-import { date } from 'yup';
-import { TextInput } from 'react-native-gesture-handler';
 import Header from '../../../components/Header';
 import Input from '../../../components/Input';
 import Button from '../../../components/Button';
@@ -61,7 +59,7 @@ const NewScheduling: React.FC = () => {
       time: newTime,
     };
     console.log(newData);
-
+    Alert.alert('', 'Agendado com sucesso!');
     navigation.navigate('Home');
   }
 
