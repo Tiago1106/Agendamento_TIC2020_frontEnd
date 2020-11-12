@@ -3,6 +3,8 @@ import { View, Alert } from 'react-native';
 import { Form, FormHandles } from '@unform/core';
 import { Picker } from '@react-native-picker/picker';
 import { useNavigation } from '@react-navigation/native';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import { format } from 'date-fns';
 
 import Header from '../../../components/Header';
 import Input from '../../../components/Input';
@@ -33,6 +35,11 @@ const NewScheduling: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
   const navigation = useNavigation();
 
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [isDatePickerTimeVisible, setDatePickerTimeVisibility] = useState(
+    false,
+  );
+
   const [selectService, setSelectService] = useState('');
   const [newDate, setNewDate] = useState('');
   const [newTime, setNewTime] = useState('');
@@ -51,6 +58,35 @@ const NewScheduling: React.FC = () => {
     setNewTime(newHour);
   }
 
+  const showDatePicker = (): void => {
+    setDatePickerVisibility(true);
+  };
+  const showTimePicker = (): void => {
+    setDatePickerTimeVisibility(true);
+  };
+
+  const hideDatePicker = (): void => {
+    setDatePickerVisibility(false);
+  };
+
+  const hideTimePicker = (): void => {
+    setDatePickerVisibility(false);
+  };
+
+  const handleConfirm = (date: Date): void => {
+    const newDatePicker = format(date, 'dd/MM/yyyy');
+
+    setNewDate(newDatePicker);
+    hideDatePicker();
+  };
+
+  const handleTimeConfirm = (date: Date): void => {
+    const newTimePicker = format(date, 'hh:mm');
+
+    setNewTime(newTimePicker);
+    hideDatePicker();
+  };
+
   async function createSchenduling(): Promise<void> {
     const newData = {
       nameProvider: 'Salão dos brother',
@@ -60,7 +96,7 @@ const NewScheduling: React.FC = () => {
     };
     console.log(newData);
     Alert.alert('', 'Agendado com sucesso!');
-    navigation.navigate('Home');
+    // navigation.navigate('Home');
   }
 
   return (
@@ -110,6 +146,24 @@ const NewScheduling: React.FC = () => {
               maxLength={5}
               placeholder="hh:mm"
             />
+            <DateTimePickerModal
+              isVisible={isDatePickerVisible}
+              mode="date"
+              onConfirm={handleConfirm}
+              onCancel={hideDatePicker}
+              cancelTextIOS="Cancelar"
+              confirmTextIOS="Confirmar"
+            />
+            <DateTimePickerModal
+              isVisible={isDatePickerTimeVisible}
+              mode="time"
+              onConfirm={handleTimeConfirm}
+              onCancel={hideTimePicker}
+              cancelTextIOS="Cancelar"
+              confirmTextIOS="Confirmar"
+            />
+            <Button onPress={showDatePicker}>Clica Date</Button>
+            <Button onPress={showTimePicker}>Clica Time</Button>
           </Form>
         </AreaForm>
         <Button green icon="plus" onPress={() => createSchenduling()}>
