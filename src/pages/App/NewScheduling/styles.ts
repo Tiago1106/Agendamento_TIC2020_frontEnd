@@ -23,3 +23,27 @@ export const AreaSelect = styled.View`
   border-color: #232129;
   align-items: center;
 `;
+
+export const ConfirmationView = styled.View`
+  flex: 1;
+  background: #f89;
+`;
+
+export const AreaSelectInput = styled.View`
+  justify-content: center;
+  border: 1px solid #000;
+  width: 100%;
+  height: 48px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+
+  padding-left: 16px;
+  font-family: 'OdibeeSans-Regular';
+  font-size: 20px;
+`;
+
+export const TextAreaSelect = styled.Text`
+  color: #333;
+  font-size: 16px;
+  font-family: 'OdibeeSans-Regular';
+`;

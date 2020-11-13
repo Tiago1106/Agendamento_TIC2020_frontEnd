@@ -11,7 +11,14 @@ import Input from '../../../components/Input';
 import Button from '../../../components/Button';
 import { numberMonth, dateMask, hourMask } from '../../../utils/trasnforms';
 
-import { Container, AreaSelect, AreaForm } from './styles';
+import {
+  Container,
+  AreaSelect,
+  AreaForm,
+  ConfirmationView,
+  AreaSelectInput,
+  TextAreaSelect,
+} from './styles';
 
 const services = [
   {
@@ -41,22 +48,9 @@ const NewScheduling: React.FC = () => {
   );
 
   const [selectService, setSelectService] = useState('');
+
   const [newDate, setNewDate] = useState('');
   const [newTime, setNewTime] = useState('');
-
-  function selectDate(data: Date): void {
-    const newData = data.toString();
-    const month = newData.substring(4, 7);
-    const newDay = newData.substring(8, 10);
-    const newYear = newData.substring(11, 15);
-    const newMonth = numberMonth(month);
-    setNewDate(`${newDay}/${newMonth}/${newYear}`);
-  }
-
-  function selectHour(hour: Date): void {
-    const newHour = hour.toString().substring(16, 21);
-    setNewTime(newHour);
-  }
 
   const showDatePicker = (): void => {
     setDatePickerVisibility(true);
@@ -96,6 +90,7 @@ const NewScheduling: React.FC = () => {
     };
     console.log(newData);
     Alert.alert('', 'Agendado com sucesso!');
+
     // navigation.navigate('Home');
   }
 
@@ -130,22 +125,17 @@ const NewScheduling: React.FC = () => {
                 ))}
               </Picker>
             </AreaSelect>
-            <Input
-              name="date"
-              icon="calendar"
-              onChangeText={(text) => setNewDate(text)}
-              value={dateMask(newDate)}
-              maxLength={10}
-              placeholder="dd/mm/aaaa"
-            />
-            <Input
-              name="hour"
-              icon="clock"
-              onChangeText={(text) => setNewTime(text)}
-              value={hourMask(newTime)}
-              maxLength={5}
-              placeholder="hh:mm"
-            />
+
+            <AreaSelectInput>
+              <TextAreaSelect onPress={showDatePicker}>
+                {newDate === '' ? 'dd/mm/aaaa' : dateMask(newDate)}
+              </TextAreaSelect>
+            </AreaSelectInput>
+            <AreaSelectInput>
+              <TextAreaSelect onPress={showTimePicker}>
+                {newTime === '' ? 'hh:mm' : hourMask(newTime)}
+              </TextAreaSelect>
+            </AreaSelectInput>
             <DateTimePickerModal
               isVisible={isDatePickerVisible}
               mode="date"
@@ -162,8 +152,6 @@ const NewScheduling: React.FC = () => {
               cancelTextIOS="Cancelar"
               confirmTextIOS="Confirmar"
             />
-            <Button onPress={showDatePicker}>Clica Date</Button>
-            <Button onPress={showTimePicker}>Clica Time</Button>
           </Form>
         </AreaForm>
         <Button green icon="plus" onPress={() => createSchenduling()}>
