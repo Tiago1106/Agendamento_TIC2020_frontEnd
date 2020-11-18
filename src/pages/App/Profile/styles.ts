@@ -24,3 +24,10 @@ export const Letter = styled.Text`
   font-family: 'OdibeeSans-Regular';
   font-size: 50px;
 `;
+
+export const SubTitle = styled.Text`
+  color: #111;
+  font-family: 'OdibeeSans-Regular';
+  font-size: 16px;
+  margin-top: 10px;
+`;

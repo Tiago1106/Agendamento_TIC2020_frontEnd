@@ -8,9 +8,15 @@ import React, {
 import AsyncStorage from '@react-native-community/async-storage';
 import api from '../services/api';
 
+interface UserProps {
+  email: string;
+  name: string;
+  id: string;
+  password: string;
+}
 interface AuthState {
   token: string;
-  user: object;
+  user: UserProps;
 }
 
 interface SignInCredentials {
@@ -19,10 +25,11 @@ interface SignInCredentials {
 }
 
 interface AuthContextData {
-  user: object;
+  user: UserProps;
   loading: boolean;
   signIn(credentials: SignInCredentials): Promise<void>;
   signOut(): void;
+  updateUser(newUser: UserProps): void;
 }
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
@@ -48,8 +55,22 @@ const AuthProvider: React.FC = ({ children }) => {
     loadStorageData();
   });
 
+  const updateUser = useCallback(async ({ name, email, password, id }) => {
+    const token = await AsyncStorage.getItem('@GoBarber:token');
+    console.log('eafa');
+    setData({
+      token,
+      user: {
+        email,
+        name,
+        password,
+        id,
+      },
+    });
+  }, []);
+
   const signIn = useCallback(async ({ email, password }) => {
-    const response = await api.post('/sessions', {
+    const response = await api.post('/session', {
       email,
       password,
     });
@@ -74,7 +95,9 @@ const AuthProvider: React.FC = ({ children }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user: data.user, loading, signIn, signOut }}>
+    <AuthContext.Provider
+      value={{ user: data.user, loading, signIn, signOut, updateUser }}
+    >
       {children}
     </AuthContext.Provider>
   );

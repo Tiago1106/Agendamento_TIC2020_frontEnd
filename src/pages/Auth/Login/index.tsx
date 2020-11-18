@@ -4,6 +4,7 @@ import { FormHandles } from '@unform/core';
 import * as Yup from 'yup';
 import { useNavigation } from '@react-navigation/native';
 
+import api from '../../../services/api';
 import { useAuth } from '../../../hooks/auth';
 import getValidationErrors from '../../../utils/getValidationErrors';
 
@@ -33,44 +34,47 @@ interface SignInFormData {
 }
 
 const Login: React.FC = () => {
-  const { signIn } = useAuth();
+  const { signIn, signOut } = useAuth();
   const formRef = useRef<FormHandles>(null);
   const passwordInputRef = useRef<TextInput>(null);
   const navigation = useNavigation();
 
-  const handleSignIn = useCallback(async (data: SignInFormData) => {
-    try {
-      formRef.current?.setErrors({});
+  const handleSignIn = useCallback(
+    async (data: SignInFormData) => {
+      try {
+        formRef.current?.setErrors({});
 
-      const schema = Yup.object().shape({
-        email: Yup.string()
-          .required('E-mail obrigatório')
-          .email('Digite um e-mail valido'),
-        password: Yup.string().required('Senha obrigatória'),
-      });
+        const schema = Yup.object().shape({
+          email: Yup.string()
+            .required('E-mail obrigatório')
+            .email('Digite um e-mail valido'),
+          password: Yup.string().required('Senha obrigatória'),
+        });
 
-      await schema.validate(data, {
-        abortEarly: false,
-      });
+        await schema.validate(data, {
+          abortEarly: false,
+        });
 
-      await signIn({
-        email: data.email,
-        password: data.password,
-      });
+        await signIn({
+          email: data.email,
+          password: data.password,
+        });
 
-      Alert.alert('Aviso', 'Você foi logado com sucesso');
-    } catch (err) {
-      if (err instanceof Yup.ValidationError) {
-        const errors = getValidationErrors(err);
+        Alert.alert('Aviso', 'Você foi logado com sucesso');
+      } catch (err) {
+        if (err instanceof Yup.ValidationError) {
+          const errors = getValidationErrors(err);
 
-        formRef.current?.setErrors(errors);
+          formRef.current?.setErrors(errors);
+        }
+        Alert.alert(
+          'Erro na autenticação',
+          'Ocorreu um erro ao fazer login, cheque as credenciais',
+        );
       }
-      Alert.alert(
-        'Erro na autenticação',
-        'Ocorreu um erro ao fazer login, cheque as credenciais',
-      );
-    }
-  }, []);
+    },
+    [signIn],
+  );
 
   return (
     <ImageBackground
@@ -125,8 +129,8 @@ const Login: React.FC = () => {
               green={false}
               icon="log-out"
               onPress={() => {
-                // formRef.current?.submitForm();
-                navigation.navigate('Home');
+                formRef.current?.submitForm();
+                // navigation.navigate('Home');
               }}
             >
               Realizar Login

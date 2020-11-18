@@ -5,6 +5,7 @@ import * as Yup from 'yup';
 import { useNavigation } from '@react-navigation/native';
 
 import getValidationErrors from '../../../utils/getValidationErrors';
+import api from '../../../services/api';
 
 import BackgroundImage from '../../../assets/backgroundImage.jpg';
 import LogoImage from '../../../assets/Logo.png';
@@ -51,8 +52,13 @@ const CadastroUser: React.FC = () => {
         abortEarly: false,
       });
 
+      const response = await api.post('/users', data);
+
+      console.log(response);
+
       Alert.alert('Aviso', 'Você foi cadastrado com sucesso');
     } catch (err) {
+      console.log(err);
       if (err instanceof Yup.ValidationError) {
         const errors = getValidationErrors(err);
 

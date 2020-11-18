@@ -36,6 +36,7 @@ export const Title = styled.Text`
   color: #777;
   font-family: 'OdibeeSans-Regular';
   margin-bottom: 20px;
+  margin-right: 20px;
 `;
 
 export const AreaForm = styled(Form)`

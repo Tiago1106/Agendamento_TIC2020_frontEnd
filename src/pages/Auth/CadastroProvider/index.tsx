@@ -1,10 +1,9 @@
-import React, { useRef, useCallback, useState, useEffect } from 'react';
-import { ImageBackground, TextInput, Alert } from 'react-native';
+import React, { useRef, useState } from 'react';
+import { ImageBackground, Alert } from 'react-native';
 import { FormHandles } from '@unform/core';
-import * as Yup from 'yup';
 import { useNavigation } from '@react-navigation/native';
-
-import getValidationErrors from '../../../utils/getValidationErrors';
+import { RadioButton } from 'react-native-paper';
+import { cpfMask, cnpjMask, cepMask } from '../../../utils/trasnforms';
 
 import BackgroundImage from '../../../assets/backgroundImage.jpg';
 import LogoImage from '../../../assets/Logo.png';
@@ -23,83 +22,59 @@ import {
   AreaCreateAccount,
   CreateAccount,
   NameInput,
-  Icon,
   AreaRow,
-  AreaService,
-  AreaRemove,
-  AreaTimer,
-  MetadeTimer,
 } from './styles';
-
-interface SignInFormData {
-  name: string;
-  email: string;
-  password: string;
-}
 
 const CadastroProvider: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
   const navigation = useNavigation();
-  const [quantityServices, setQuantityService] = useState<number[]>([1]);
-  const [quantityTimer, setQuantityTimer] = useState<number[]>([1]);
 
-  const handleSignIn = useCallback(async (data: SignInFormData) => {
+  const [isCpf, setIsCpf] = useState<boolean>(true);
+
+  const [name, setName] = useState<string>('');
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [cpf, setCpf] = useState<string>('');
+  const [cnpj, setCnpj] = useState<string>('');
+  const [nameLocale, setNameLocale] = useState<string>('');
+  const [notes, setNotes] = useState<string>('');
+
+  const [cep, setCep] = useState<string>('');
+  const [street, setStreet] = useState<string>('');
+  const [number, setNumber] = useState<string>('');
+  const [bairro, setBairro] = useState<string>('');
+  const [complement, setComplement] = useState<string>('');
+  const [city, setCity] = useState<string>('');
+  const [state, setState] = useState<string>('');
+
+  async function createProvider(): Promise<void> {
     try {
-      formRef.current?.setErrors({});
+      const data = {
+        name,
+        email,
+        password,
+        cpf,
+        cnpj,
+        nameLocale,
+        noteLocale: notes,
+        cep,
+        street,
+        number,
+        neighborhood: bairro,
+        complement,
+        city,
+        uf: state,
+      };
 
-      const schema = Yup.object().shape({
-        name: Yup.string().required('Nome obrigatório'),
-        email: Yup.string()
-          .required('E-mail obrigatório')
-          .email('Digite um e-mail valido'),
-        password: Yup.string().required('Senha obrigatória'),
-      });
+      console.log(data);
 
-      await schema.validate(data, {
-        abortEarly: false,
-      });
-
-      Alert.alert('Aviso', 'Você foi cadastrado com sucesso');
+      Alert.alert('Aviso', 'Continua seu cadastro com seus serviços');
+      navigation.navigate('CreateService');
     } catch (err) {
-      if (err instanceof Yup.ValidationError) {
-        const errors = getValidationErrors(err);
-
-        formRef.current?.setErrors(errors);
-      }
       Alert.alert(
         'Erro na autenticação',
         'Ocorreu um erro ao fazer cadastro, cheque as credenciais',
       );
-    }
-  }, []);
-
-  function plusServices(): void {
-    setQuantityService([...quantityServices, 1]);
-  }
-
-  function plusTimer(): void {
-    setQuantityTimer([...quantityTimer, 1]);
-  }
-
-  function removeService(index: number): void {
-    const newList = quantityServices.filter((service, indexService) => {// eslint-disable-line
-      if (indexService !== index) {
-        return service;
-      }
-    });
-    if (newList.length !== 0) {
-      setQuantityService([...newList]);
-    }
-  }
-
-  function removeTimer(index: number): void {
-    const newList = quantityTimer.filter((time, indexTimer) => {// eslint-disable-line
-      if (indexTimer !== index) {
-        return time;
-      }
-    });
-    if (newList.length !== 0) {
-      setQuantityTimer([...newList]);
     }
   }
 
@@ -122,9 +97,16 @@ const CadastroProvider: React.FC = () => {
           <ImageLogo source={LogoImage} />
         </AreaLogo>
         <AreaLogin>
-          <AreaForm ref={formRef} onSubmit={handleSignIn}>
+          <AreaForm ref={formRef} onSubmit={createProvider}>
             <Title>Cadastro</Title>
-            <Input name="name" icon="user" placeholder="Nome" />
+
+            <Input
+              name="name"
+              icon="user"
+              placeholder="Nome"
+              value={name}
+              onChangeText={(e) => setName(e)}
+            />
             <Input
               autoCorrect={false}
               autoCapitalize="none"
@@ -132,6 +114,8 @@ const CadastroProvider: React.FC = () => {
               name="email"
               icon="mail"
               placeholder="E-mail"
+              value={email}
+              onChangeText={(e) => setEmail(e)}
             />
             <Input
               name="password"
@@ -139,31 +123,107 @@ const CadastroProvider: React.FC = () => {
               placeholder="Senha"
               secureTextEntry
               autoCapitalize="none"
+              value={password}
+              onChangeText={(e) => setPassword(e)}
             />
+            <AreaRow>
+              <RadioButton
+                value="first"
+                status={isCpf === true ? 'checked' : 'unchecked'}
+                onPress={() => setIsCpf(true)}
+                color="#eb5425"
+              />
+              <NameInput>CPF</NameInput>
+              <RadioButton
+                value="second"
+                status={isCpf === false ? 'checked' : 'unchecked'}
+                onPress={() => setIsCpf(false)}
+                color="#eb5425"
+              />
+              <NameInput>CNPJ</NameInput>
+            </AreaRow>
+            {isCpf ? (
+              <Input
+                name="cpf"
+                placeholder="CPF"
+                value={cpfMask(cpf)}
+                onChangeText={(e) => {
+                  setCpf(e);
+                  setCnpj('');
+                }}
+                maxLength={14}
+              />
+            ) : (
+              <Input
+                name="cnpj"
+                placeholder="CNPJ"
+                value={cnpjMask(cnpj)}
+                onChangeText={(e) => {
+                  setCpf('');
+                  setCnpj(e);
+                }}
+                maxLength={18}
+              />
+            )}
             <Input
               name="nameLocale"
               icon="home"
               placeholder="Nome do estabelecimento"
+              value={nameLocale}
+              onChangeText={(e) => setNameLocale(e)}
             />
-            <AreaInput placeholder="Observação do estabelecimento" />
+            <AreaInput
+              placeholder="Observação do estabelecimento"
+              value={notes}
+              onChangeText={(e) => setNotes(e)}
+            />
             <NameInput>Endereço</NameInput>
-            <Input name="cep" icon="home" placeholder="CEP" />
-            <Input name="street" icon="home" placeholder="Rua" />
+            <Input
+              name="cep"
+              placeholder="CEP"
+              value={cepMask(cep)}
+              onChangeText={(e) => setCep(e)}
+              maxLength={9}
+            />
+            <Input
+              name="street"
+              placeholder="Rua"
+              value={street}
+              onChangeText={(e) => setStreet(e)}
+            />
             <Input
               name="number"
-              icon="home"
               placeholder="N°"
               keyboardType="numeric"
+              value={number}
+              onChangeText={(e) => setNumber(e)}
             />
-            <Input name="neighborhood" icon="home" placeholder="Bairro" />
+            <Input
+              name="neighborhood"
+              placeholder="Bairro"
+              value={bairro}
+              onChangeText={(e) => setBairro(e)}
+            />
             <Input
               name="complement"
-              icon="home"
               placeholder="Complemento (opicional)"
+              value={complement}
+              onChangeText={(e) => setComplement(e)}
             />
-            <Input name="city" icon="home" placeholder="Cidade" />
-            <Input name="uf" icon="home" placeholder="Estado (sigla)" />
-            <AreaRow>
+            <Input
+              name="city"
+              placeholder="Cidade"
+              value={city}
+              onChangeText={(e) => setCity(e)}
+            />
+            <Input
+              name="uf"
+              placeholder="Estado (sigla)"
+              value={state}
+              onChangeText={(e) => setState(e)}
+              maxLength={2}
+            />
+            {/* <AreaRow>
               <NameInput>Serviços</NameInput>
               <Icon name="plus" size={22} onPress={() => plusServices()} />
             </AreaRow>
@@ -226,16 +286,16 @@ const CadastroProvider: React.FC = () => {
                   </CreateAccount>
                 </AreaRemove>
               </>
-            ))}
+            ))} */}
 
             <Button
               green={false}
               icon="log-out"
               onPress={() => {
-                formRef.current?.submitForm();
+                createProvider();
               }}
             >
-              Cadastrar
+              Continuar
             </Button>
           </AreaForm>
           <AreaCreateAccount>
