@@ -9,7 +9,7 @@ export const Container = styled.View`
 export const AreaImage = styled.View`
   width: 100%;
   height: 30%;
-  background-color: #f4f;
+  background-color: #555;
 `;
 
 export const ButtonBack = styled(Icon)`

@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
+import { format } from 'date-fns';
+import api from '../../../services/api';
 
 import Button from '../../../components/Button';
 
@@ -18,8 +20,55 @@ import {
   AreaButton,
 } from './styles';
 
-const Provider: React.FC = () => {
+interface ServiceProps {
+  id: string;
+  name: string;
+  note: string;
+  value: string;
+  duration: string;
+}
+
+interface TimerProps {
+  id: string;
+  of: string;
+  // eslint-disable-next-line camelcase
+  up_to: string;
+}
+interface ProviderProps {
+  id: string;
+  name: string;
+  email: string;
+  password: string;
+  complement: string;
+  cnpj: string;
+  cpf: string;
+  city: string;
+  cep: string;
+  nameLocale: string;
+  noteLocale: string;
+  neighborhood: string;
+  number: string;
+  uf: string;
+  street: string;
+  services: ServiceProps[];
+  times: TimerProps[];
+}
+
+const Provider: React.FC = ({ route }: any) => {
+  const { id } = route.params;
   const navigation = useNavigation();
+  const [provider, setProvider] = useState<ProviderProps>();
+  const [hour, setHour] = useState<string>();
+
+  useEffect(() => {
+    async function showProvider(): Promise<void> {
+      const { data } = await api.get(`/provider/${id}`);
+      setProvider(data);
+      const newHour = format(new Date(), 'dd/MM/yyyy');
+      setHour(newHour);
+    }
+    showProvider();
+  }, [id]);
 
   return (
     <>
@@ -32,35 +81,30 @@ const Provider: React.FC = () => {
           />
         </AreaImage>
         <AreaInfo>
-          <Title>Salão dos brothers</Title>
-          <SubTitle>Atendimento com horário marcado rigorosamente ...</SubTitle>
+          <Title>{provider?.name}</Title>
           <SubTitle>Serviços</SubTitle>
-          <SubTitle>Barbeiro, cabelo</SubTitle>
-          <SubTitle>Cortes masculino</SubTitle>
+          {provider?.services.map((service: ServiceProps) => (
+            <SubTitle key={service.id}>
+              {`${service.name} - R$${service.value}`}
+            </SubTitle>
+          ))}
           <Row>
             <Title>Horário</Title>
             <Title>
-              10/11/2020 <DateIcon name="calendar" size={20} />
+              {hour} <DateIcon name="calendar" size={20} />
             </Title>
           </Row>
-          <RowTime>
-            <ViewTimer>
-              <TitleTime>09:00</TitleTime>
-            </ViewTimer>
-            <TitleTime>AS</TitleTime>
-            <ViewTimer>
-              <TitleTime>13:00</TitleTime>
-            </ViewTimer>
-          </RowTime>
-          <RowTime>
-            <ViewTimer>
-              <TitleTime>14:00</TitleTime>
-            </ViewTimer>
-            <TitleTime>AS</TitleTime>
-            <ViewTimer>
-              <TitleTime>20:00</TitleTime>
-            </ViewTimer>
-          </RowTime>
+          {provider?.times.map((time: TimerProps) => (
+            <RowTime key={time.id}>
+              <ViewTimer>
+                <TitleTime>{time.of}</TitleTime>
+              </ViewTimer>
+              <TitleTime>AS</TitleTime>
+              <ViewTimer>
+                <TitleTime>{time.up_to}</TitleTime>
+              </ViewTimer>
+            </RowTime>
+          ))}
         </AreaInfo>
       </Container>
       <AreaButton>

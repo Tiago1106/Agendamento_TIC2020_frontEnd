@@ -9,7 +9,7 @@ import { Container, Title, Icon, AreaNothing } from './styles';
 const Home: React.FC = () => {
   return (
     <>
-      <Header title="Meus agendamentos" icon />
+      <Header title="Meus Agendamentos" icon />
       <Container
         contentContainerStyle={{
           flexGrow: 1,

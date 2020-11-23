@@ -52,11 +52,10 @@ const CadastroUser: React.FC = () => {
         abortEarly: false,
       });
 
-      const response = await api.post('/users', data);
-
-      console.log(response);
+      await api.post('/users', data);
 
       Alert.alert('Aviso', 'Você foi cadastrado com sucesso');
+      navigation.navigate('Login');
     } catch (err) {
       console.log(err);
       if (err instanceof Yup.ValidationError) {

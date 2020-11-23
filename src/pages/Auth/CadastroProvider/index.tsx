@@ -4,6 +4,7 @@ import { FormHandles } from '@unform/core';
 import { useNavigation } from '@react-navigation/native';
 import { RadioButton } from 'react-native-paper';
 import { cpfMask, cnpjMask, cepMask } from '../../../utils/trasnforms';
+import api from '../../../services/api';
 
 import BackgroundImage from '../../../assets/backgroundImage.jpg';
 import LogoImage from '../../../assets/Logo.png';
@@ -49,27 +50,27 @@ const CadastroProvider: React.FC = () => {
 
   async function createProvider(): Promise<void> {
     try {
-      const data = {
-        name,
-        email,
-        password,
-        cpf,
-        cnpj,
-        nameLocale,
-        noteLocale: notes,
+      const dataPost = {
         cep,
-        street,
-        number,
-        neighborhood: bairro,
-        complement,
         city,
+        cnpj,
+        complement,
+        cpf,
+        email,
+        name,
+        nameLocale,
+        neighborhood: bairro,
+        noteLocale: notes,
+        number,
+        password,
+        street,
         uf: state,
       };
 
-      console.log(data);
+      const { data } = await api.post('/provider', dataPost);
 
       Alert.alert('Aviso', 'Continua seu cadastro com seus serviços');
-      navigation.navigate('CreateService');
+      navigation.navigate('CreateService', { id: data.id });
     } catch (err) {
       Alert.alert(
         'Erro na autenticação',

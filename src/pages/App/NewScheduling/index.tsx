@@ -91,7 +91,7 @@ const NewScheduling: React.FC = () => {
     console.log(newData);
     Alert.alert('', 'Agendado com sucesso!');
 
-    // navigation.navigate('Home');
+    navigation.navigate('Home');
   }
 
   return (

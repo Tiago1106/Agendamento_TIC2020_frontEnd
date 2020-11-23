@@ -5,6 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 
 import BackgroundImage from '../../../../assets/backgroundImage.jpg';
 import LogoImage from '../../../../assets/Logo.png';
+import api from '../../../../services/api';
 
 import Input from '../../../../components/Input';
 import Button from '../../../../components/Button';
@@ -24,7 +25,8 @@ import {
   AreaService,
 } from '../styles';
 
-const CadastroService: React.FC = () => {
+const CadastroService: React.FC = ({ route }: any) => {
+  const { id } = route.params;
   const formRef = useRef<FormHandles>(null);
   const navigation = useNavigation();
 
@@ -33,19 +35,36 @@ const CadastroService: React.FC = () => {
   const [value, setValue] = useState<string>('');
   const [duraction, setDuraction] = useState<string>('');
 
-  function handleNewService(isNew: boolean): void {
+  async function handleNewService(isNew: boolean): Promise<void> {
+    const dataPost = {
+      name: service,
+      duration: duraction,
+      note,
+      value,
+      provider_id: id,
+    };
     if (isNew) {
-      setService('');
-      setNote('');
-      setValue('');
-      setDuraction('');
-      Alert.alert('Serviço cadastrado', 'Cadastre outro');
+      try {
+        await api.post('/services', dataPost);
+        setService('');
+        setNote('');
+        setValue('');
+        setDuraction('');
+        Alert.alert('Serviço cadastrado', 'Cadastre outro');
+      } catch (err) {
+        Alert.alert('Erro', 'Algo de errado aconteceu, tente novamente');
+      }
     } else {
-      Alert.alert(
-        'Serviços cadastrados',
-        'Cadastre agora seu horário de trabalho',
-      );
-      navigation.navigate('CreateTime');
+      try {
+        await api.post('/services', dataPost);
+        Alert.alert(
+          'Serviços cadastrados',
+          'Cadastre agora seu horário de trabalho',
+        );
+        navigation.navigate('CreateTime', { id });
+      } catch (err) {
+        Alert.alert('Erro', 'Algo de errado aconteceu, tente novamente');
+      }
     }
   }
 

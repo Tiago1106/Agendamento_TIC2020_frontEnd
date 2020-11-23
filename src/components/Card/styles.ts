@@ -1,7 +1,7 @@
 import styled from 'styled-components/native';
 import Entypo from 'react-native-vector-icons/Entypo';
 
-export const Container = styled.View`
+export const Container = styled.TouchableOpacity`
   width: 100%;
   height: 90px;
   background-color: #fff;

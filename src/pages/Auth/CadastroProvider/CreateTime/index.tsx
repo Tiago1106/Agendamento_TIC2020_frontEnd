@@ -1,25 +1,20 @@
-import React, { useRef, useCallback, useState, useEffect } from 'react';
-import { ImageBackground, TextInput, Alert } from 'react-native';
+import React, { useRef, useState } from 'react';
+import { ImageBackground, Alert } from 'react-native';
 import { FormHandles } from '@unform/core';
-import * as Yup from 'yup';
 import { useNavigation } from '@react-navigation/native';
-import { RadioButton } from 'react-native-paper';
+import api from '../../../../services/api';
 import { hourMask } from '../../../../utils/trasnforms';
-
-import getValidationErrors from '../../../../utils/getValidationErrors';
 
 import BackgroundImage from '../../../../assets/backgroundImage.jpg';
 import LogoImage from '../../../../assets/Logo.png';
 
 import Input from '../../../../components/Input';
 import Button from '../../../../components/Button';
-import AreaInput from '../../../../components/AreaInput';
 
 import {
   Container,
   AreaLogo,
   ImageLogo,
-  AreaLogin,
   Title,
   AreaForm,
   AreaCreateAccount,
@@ -32,21 +27,37 @@ import {
 
 import { Area } from './styles';
 
-const CadastroProvider: React.FC = () => {
+const CadastroProvider: React.FC = ({ route }: any) => {
+  const { id } = route.params;
   const formRef = useRef<FormHandles>(null);
   const navigation = useNavigation();
 
   const [das, setDas] = useState<string>('');
   const [ate, setAte] = useState<string>('');
 
-  function handleNewTime(isNew: boolean): void {
+  async function handleNewTime(isNew: boolean): Promise<void> {
+    const dataPost = {
+      provider_id: id,
+      of: das,
+      up_to: ate,
+    };
     if (isNew) {
-      setDas('');
-      setAte('');
-      Alert.alert('Horário cadastrado', 'Cadastre outro');
+      try {
+        await api.post('/times', dataPost);
+        setDas('');
+        setAte('');
+        Alert.alert('Horário cadastrado', 'Cadastre outro');
+      } catch (error) {
+        Alert.alert('Erro', 'Algo de errado aconteceu, tente novamente');
+      }
     } else {
-      Alert.alert('Cadastro finalizado', 'Faça seu login e começe a usar');
-      navigation.navigate('Login');
+      try {
+        await api.post('/times', dataPost);
+        Alert.alert('Cadastro finalizado', 'Faça seu login e começe a usar');
+        navigation.navigate('Login');
+      } catch (error) {
+        Alert.alert('Erro', 'Algo de errado aconteceu, tente novamente');
+      }
     }
   }
 

@@ -60,7 +60,7 @@ const Profile: React.FC = () => {
   async function deleteAccount(): Promise<void> {
     await api.delete(`/users/${user.id}`);
     signOut();
-    // console.log(user);
+    Alert.alert('', 'Conta deletada com sucesso');
   }
 
   return (
