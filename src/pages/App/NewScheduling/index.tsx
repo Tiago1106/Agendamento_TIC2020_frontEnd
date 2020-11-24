@@ -1,10 +1,13 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { View, Alert } from 'react-native';
 import { Form, FormHandles } from '@unform/core';
 import { Picker } from '@react-native-picker/picker';
 import { useNavigation } from '@react-navigation/native';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { format } from 'date-fns';
+
+import api from '../../../services/api';
+import { useAuth } from '../../../hooks/auth';
 
 import Header from '../../../components/Header';
 import Input from '../../../components/Input';
@@ -38,9 +41,33 @@ const services = [
   },
 ];
 
-const NewScheduling: React.FC = () => {
+interface ServiceProps {
+  id: string;
+  name: string;
+  note: string;
+  value: string;
+}
+interface ProviderProps {
+  id: string;
+  name: string;
+  services: ServiceProps[];
+}
+
+const NewScheduling: React.FC = ({ route }: any) => {
+  const { id } = route.params;
+  const { user } = useAuth();
   const formRef = useRef<FormHandles>(null);
   const navigation = useNavigation();
+
+  const [provider, setProvider] = useState<ProviderProps>();
+
+  useEffect(() => {
+    async function showProvider(): Promise<void> {
+      const { data } = await api.get(`/provider/${id}`);
+      setProvider(data);
+    }
+    showProvider();
+  }, [id]);
 
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [isDatePickerTimeVisible, setDatePickerTimeVisibility] = useState(
@@ -82,16 +109,22 @@ const NewScheduling: React.FC = () => {
   };
 
   async function createSchenduling(): Promise<void> {
-    const newData = {
-      nameProvider: 'Salão dos brother',
-      nameSelect: selectService,
-      date: newDate,
-      time: newTime,
-    };
-    console.log(newData);
-    Alert.alert('', 'Agendado com sucesso!');
+    try {
+      const newData = {
+        provider_id: id,
+        service_id: selectService,
+        date: newDate,
+        time: newTime,
+        user_id: user.id,
+      };
 
-    navigation.navigate('Home');
+      await api.post('/appointments', newData);
+      Alert.alert('', 'Agendado com sucesso!');
+      navigation.navigate('Home');
+    } catch (error) {
+      console.log(error);
+      Alert.alert('', 'Agendamento com erro, tente novamento!');
+    }
   }
 
   return (
@@ -102,7 +135,7 @@ const NewScheduling: React.FC = () => {
           <Form ref={formRef} onSubmit={() => console.log('asd')}>
             <Input
               name="nameprovider"
-              defaultValue="Salão dos brother"
+              defaultValue={provider?.name}
               editable={false}
               icon="home"
             />
@@ -110,19 +143,27 @@ const NewScheduling: React.FC = () => {
               <Picker
                 selectedValue={selectService}
                 style={{ height: 50, width: '100%' }}
-                onValueChange={(itemValue, itemIndex) =>
+                onValueChange={(itemValue) =>
                   setSelectService(itemValue.toString())
                 } // eslint-disable-line
               >
                 <Picker.Item label="Selecione o serviço" value="notService" />
-                {services.map((item) => (
+                {provider?.services.map((service: ServiceProps) => (
+                  <Picker.Item
+                    color="#333"
+                    key={service.id}
+                    label={`${service.name} - R$${service.value}`}
+                    value={service.id}
+                  />
+                ))}
+                {/* {services.map((item) => (
                   <Picker.Item
                     color="#333"
                     key={item.id}
                     label={item.nameService}
                     value={item.nameService}
                   />
-                ))}
+                ))} */}
               </Picker>
             </AreaSelect>
 

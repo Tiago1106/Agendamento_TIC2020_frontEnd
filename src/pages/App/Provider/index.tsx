@@ -109,7 +109,7 @@ const Provider: React.FC = ({ route }: any) => {
       </Container>
       <AreaButton>
         <Button
-          onPress={() => navigation.navigate('NewScheduling')}
+          onPress={() => navigation.navigate('NewScheduling', { id })}
           green
           icon="plus"
         >
